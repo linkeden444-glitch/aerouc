@@ -25,7 +25,14 @@ jobs:
               unzip -o "$f" || true
             fi
           done
-          echo "=== REPOSITORY STRUCTURE AFTER CHECKOUT / UNZIP ==="
+
+      - name: Fix All Linux File & Directory Permissions
+        run: |
+          echo "Granting full 777 permissions across entire workspace..."
+          chmod -R 777 . || true
+          find . -type d -exec chmod 755 {} + || true
+          find . -name "gradlew*" -exec chmod +x {} + || true
+          echo "=== WORKSPACE PERMISSIONS APPLIED ==="
           ls -la
 
       - name: Set up Java JDK 17
@@ -34,23 +41,15 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Locate Android Project & Grant Gradlew Permissions
+      - name: Grant Execute Permission to Gradle Wrapper
         run: |
-          if [ -f "./gradlew" ]; then
-            chmod +x ./gradlew
-          elif [ -f "./Android_App/gradlew" ]; then
-            chmod +x ./Android_App/gradlew
-          elif [ -f "./AERO_ANDROID_PROJECT_V2/gradlew" ]; then
-            chmod +x ./AERO_ANDROID_PROJECT_V2/gradlew
-          else
-            GRADLEW_PATH=$(find . -name "gradlew" | head -n 1)
-            if [ -n "$GRADLEW_PATH" ]; then
-              chmod +x "$GRADLEW_PATH"
-            fi
-          fi
+          find . -name "gradlew*" -exec chmod +x {} + || true
 
       - name: Build Android Debug APK via Gradle
         run: |
+          chmod -R 777 . || true
+          find . -name "gradlew*" -exec chmod +x {} + || true
+
           if [ -f "./gradlew" ]; then
             ./gradlew assembleDebug --stacktrace --no-daemon
           elif [ -f "./Android_App/gradlew" ]; then
