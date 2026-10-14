@@ -31,6 +31,15 @@ jobs:
           echo "=== Repository Root Listing ==="
           ls -la
 
+          # Automatically extract if user uploaded a .zip file directly to GitHub
+          ZIP_FILE=$(find . -maxdepth 2 -name "*.zip" | head -n 1)
+          if [ -n "$ZIP_FILE" ]; then
+            echo "Found ZIP archive ($ZIP_FILE)! Auto-extracting project files..."
+            unzip -o "$ZIP_FILE"
+            echo "=== Listing after extraction ==="
+            ls -la
+          fi
+
           # Check if gradlew is in root or any subfolder
           if [ -f "gradlew" ]; then
             PROJECT_DIR="."
@@ -39,7 +48,7 @@ jobs:
             if [ -n "$FOUND_GRADLEW" ]; then
               PROJECT_DIR=$(dirname "$FOUND_GRADLEW")
             else
-              echo "::error::No gradlew or Android files found in this repository! Please upload the project files from the ZIP."
+              echo "::error::No gradlew found! Make sure ZIP contains the project files."
               exit 1
             fi
           fi
