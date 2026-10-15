@@ -32,10 +32,10 @@ jobs:
               cp -r $SUBDIR/* . 2>/dev/null || true
             fi
           fi
-          # Clean up any old unzipped Windows build cache / intermediates
-          rm -rf app/build build .gradle
-          # Fix full read/write/execute permissions across workspace
-          chmod -R 777 . || true
+          # Unlock all permissions across workspace with root privileges
+          sudo chmod -R 777 . || true
+          # Clean up any old unzipped build cache safely
+          sudo rm -rf app/build build .gradle || true
           sed -i 's/\r$//' gradlew || true
           chmod +x gradlew
 
