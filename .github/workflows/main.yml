@@ -32,6 +32,10 @@ jobs:
               cp -r $SUBDIR/* . 2>/dev/null || true
             fi
           fi
+          # Clean up any old unzipped Windows build cache / intermediates
+          rm -rf app/build build .gradle
+          # Fix full read/write/execute permissions across workspace
+          chmod -R 777 . || true
           sed -i 's/\r$//' gradlew || true
           chmod +x gradlew
 
@@ -43,7 +47,7 @@ jobs:
 
       - name: Build Release APK with Gradle
         run: |
-          ./gradlew assembleRelease --no-daemon --stacktrace
+          ./gradlew clean assembleRelease --no-daemon --stacktrace
 
       - name: Upload Release APK
         uses: actions/upload-artifact@v4
